@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Registration</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game Registration</h1>
+    <div id="registration-form">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+        </div>
+        <button id="register-btn">Register</button>
+    </div>
+    <div id="success-message" style="display: none;">
+        <p>Registration successful!</p>
+    </div>
+    
+    <script>
+        const tg = window.Telegram.WebApp;
+        
+        // Expand the app to full view
+        tg.expand();
+        
+        document.getElementById('register-btn').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            const telegramId = tg.initDataUnsafe.user?.id;
+            
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+            
+            if (!telegramId) {
+                alert('Cannot identify Telegram user');
+                return;
+            }
+            
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, telegramId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('registration-form').style.display = 'none';
+                    document.getElementById('success-message').style.display = 'block';
+                } else {
+                    alert(data.error || 'Registration failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Registration failed');
+            });
+        });
+    </script>
+</body>
+</html>
