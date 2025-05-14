@@ -1,0 +1,34 @@
+{
+  "time_slots": [
+    {
+      "id": 1,
+      "time": "09:00-10:00",
+      "max_players": 10,
+      "players": [
+        528650144
+      ],
+      "available": true
+    },
+    {
+      "id": 2,
+      "time": "10:00-11:00",
+      "max_players": 10,
+      "players": [
+        528650144
+      ],
+      "available": true
+    },
+    {
+      "id": 3,
+      "time": "11:00-12:00",
+      "max_players": 10,
+      "players": [],
+      "available": true
+    }
+  ],
+  "users": {
+    "528650144": {
+      "name": "Aibar"
+    }
+  }
+}
