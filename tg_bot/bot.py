@@ -1,9 +1,10 @@
 import os
-from typing import Dict
-
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+from aiogram.types import FSInputFile, URLInputFile
 
 from dotenv import load_dotenv
 from database import Database
@@ -13,109 +14,196 @@ load_dotenv()
 bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher()
 
-# Command handlers
-@dp.message(Command("start"))
-async def start(message: types.Message):
-    await message.answer(
-        "⚽ Welcome to Open Football Games Bot!\n\n"
-        "Available commands:\n"
-        "/games - View available games\n"
-        "/my_games - View games you've joined\n"
-        "/game_info [id] - Get info about specific game"
-    )
+# Initialize games with levels and addresses
+Database.initialize_games()
 
-@dp.message(Command("games"))
-async def show_games(message: types.Message):
-    slots = Database.get_available_slots()
-    if not slots:
-        await message.answer("No available games at the moment.")
+# States
+class RegistrationStates(StatesGroup):
+    entering_name = State()
+    entering_phone = State()
+    selecting_level = State()
+    selecting_date = State()
+    selecting_game= State()
+    payment = State()
+
+# Keyboards
+def get_dates_keyboard():
+    dates = Database.get_available_dates()
+    builder = ReplyKeyboardBuilder()
+    for date in dates:
+        builder.button(text=date)
+    builder.adjust(2)
+    return builder.as_markup(resize_keyboard=True)
+
+def get_levels_keyboard():
+    builder = ReplyKeyboardBuilder()
+    builder.button(text="Beginner")
+    builder.button(text="Intermediate")
+    builder.button(text="Professional")
+    builder.adjust(1)
+    return builder.as_markup(resize_keyboard=True)
+
+# Start command
+@dp.message(Command("start"))
+async def start(message: types.Message, state: FSMContext):
+    await message.answer(
+        "⚽ Welcome to Football Game Booking!\n\n"
+        "Please register to join games.\n"
+        "Enter your full name:"
+    )
+    await state.set_state(RegistrationStates.entering_name)
+
+# Registration flow
+@dp.message(RegistrationStates.entering_name)
+async def process_name(message: types.Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await message.answer("Great! Now please enter your phone number:")
+    await state.set_state(RegistrationStates.entering_phone)
+
+@dp.message(RegistrationStates.entering_phone) 
+async def process_phone(message: types.Message, state: FSMContext):
+    await state.update_data(phone=message.text)
+    await message.answer(
+        "Select your skill level:",
+        reply_markup=get_levels_keyboard()
+    )
+    await state.set_state(RegistrationStates.selecting_level)
+
+@dp.message(
+    RegistrationStates.selecting_level,
+    F.text.in_(["Beginner", "Intermediate", "Professional"])
+)
+async def process_level(message: types.Message, state: FSMContext):
+    await state.update_data(level=message.text.lower())
+    await message.answer(
+        "Now choose a date for your game:",
+        reply_markup=get_dates_keyboard()
+    )
+    await state.set_state(RegistrationStates.selecting_date)
+
+@dp.message(RegistrationStates.selecting_date)
+async def process_date(message: types.Message, state: FSMContext):
+    date = message.text
+    if date not in Database.get_available_dates():
+        await message.answer("Please select a valid date from the keyboard.")
         return
     
-    builder = InlineKeyboardBuilder()
-    for slot in slots:
-        players_count = len(slot["players"])
-        builder.button(
-            text=f"{slot['time']} ({players_count}/{slot['max_players']})", 
-            callback_data=f"join_{slot['id']}"
-        )
-    builder.adjust(1)
-    
-    await message.answer("Available games (players/max):", reply_markup=builder.as_markup())
+    await state.update_data(selected_date=date)
+    await state.set_state(RegistrationStates.selecting_game)
 
-@dp.message(Command("my_games"))
-async def my_games(message: types.Message):
-    data = Database.read()
-    user_games = []
+@dp.message(RegistrationStates.selecting_game)
+async def process_game(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    date = data["selected_date"]
     
-    for slot in data["time_slots"]:
-        if message.from_user.id in slot["players"]:
-            players_count = len(slot["players"])
-            user_games.append(
-                f"Game {slot['id']}: {slot['time']} "
-                f"({players_count}/{slot['max_players']} players)"
-            )
+    # Get games matching both date and level
+    games = [g for g in Database.get_games_by_date(date)]
     
-    if user_games:
-        await message.answer("Games you've joined:\n\n" + "\n".join(user_games))
-    else:
-        await message.answer("You haven't joined any games yet.")
-
-@dp.message(Command("game_info"))
-async def game_info(message: types.Message):
-    try:
-        slot_id = int(message.text.split()[1])
-        slot = Database.get_slot_info(slot_id)
-        if not slot:
-            await message.answer("Game not found.")
-            return
-        
-        players_info = []
-        data = Database.read()
-        for user_id in slot["players"]:
-            user = data["users"].get(str(user_id))
-            players_info.append(f"- {user['name']} (ID: {user_id})")
-        
-        await message.answer(
-            f"Game {slot['id']} Info:\n"
-            f"Time: {slot['time']}\n"
-            f"Players: {len(slot['players'])}/{slot['max_players']}\n\n"
-            "Participants:\n" + "\n".join(players_info)
-        )
-    except (IndexError, ValueError):
-        await message.answer("Usage: /game_info [game_id]")
-
-# Callback handlers
-@dp.callback_query(F.data.startswith("join_"))
-async def join_game(callback: types.CallbackQuery):
-    slot_id = int(callback.data.split("_")[1])
-    slot = Database.join_slot(
-        slot_id,
-        callback.from_user.id,
-        callback.from_user.full_name
+    if not games:
+        await message.answer("No level games available for this date.")
+        return
+    
+    # Save user profile
+    Database.create_user(
+        message.from_user.id,
+        data["name"],
+        data["phone"],
+        data["level"]
     )
     
-    if not slot:
+    # Show each matching game
+    for game in games:
+        players = [Database.get_user(p) for p in game["players"]]
+        player_names = [p["name"] for p in players if p]
+        
+        caption = (
+            f"⚽ {game['field']}\n"
+            f"📅 {game['date']} {game['time']}\n"
+            f"📍 {game['address']}\n"
+            f"🏆 Level: {game['level'].capitalize()}\n"
+            f"💵 Price: {game['price']} RUB\n"
+            f"👥 Players: {len(game['players'])}/{game['max_players']}\n"
+            f"📝 {game['description']}\n\n"
+            f"Registered players:\n" + "\n".join(player_names)
+        )
+        
+        photo = types.FSInputFile(path=f"images/{game['photo']}")
+            
+        builder = InlineKeyboardBuilder()
+        builder.button(
+            text="Register for this game", 
+            callback_data=f"register_{game['id']}"
+        )
+        
+        await message.answer_photo(
+            photo,
+            caption=caption,
+            reply_markup=builder.as_markup()
+        )
+
+# Game registration
+@dp.callback_query(F.data.startswith("register_"))
+async def register_game(callback: types.CallbackQuery, state: FSMContext):
+    game_id = int(callback.data.split("_")[1])
+    game = Database.get_game(game_id)
+    user = Database.get_user(callback.from_user.id)
+    
+    if not game:
         await callback.answer("Game not found!")
         return
     
-    players_count = len(slot["players"])
-    if players_count > slot["max_players"]:
-        await callback.answer("Game is already full!")
+    if not user:
+        await callback.answer("Please complete registration first!")
         return
     
-    await callback.answer(f"You joined the {slot['time']} game!")
+    if len(game["players"]) >= game["max_players"]:
+        await callback.answer("This game is already full!")
+        return
     
-    # Update the message
+    # Create payment
+    payment_id = Database.create_payment(game_id, callback.from_user.id)
+    
+    # Payment button
     builder = InlineKeyboardBuilder()
-    for s in Database.get_available_slots():
-        players_count = len(s["players"])
-        builder.button(
-            text=f"{s['time']} ({players_count}/{s['max_players']})", 
-            callback_data=f"join_{s['id']}"
-        )
-    builder.adjust(1)
+    builder.button(
+        text=f"Pay {game['price']} RUB", 
+        callback_data=f"pay_{payment_id}"
+    )
     
-    await callback.message.edit_reply_markup(reply_markup=builder.as_markup())
+    await callback.message.answer(
+        f"Please complete payment of {game['price']} RUB to register for:\n"
+        f"{game['field']} - {game['date']} {game['time']}\n"
+        f"Address: {game['address']}\n"
+        f"Level: {game['level'].capitalize()}",
+        reply_markup=builder.as_markup()
+    )
+    
+    await callback.answer()
+
+# Payment simulation
+@dp.callback_query(F.data.startswith("pay_"))
+async def process_payment(callback: types.CallbackQuery):
+    payment_id = callback.data.split("_")[1]
+    
+    if Database.confirm_payment(payment_id):
+        payment = Database._read()["payments"][payment_id]
+        game = Database.get_game(payment["game_id"])
+        user = Database.get_user(callback.from_user.id)
+        
+        await callback.message.answer(
+            f"✅ Payment successful!\n"
+            f"You are now registered for:\n"
+            f"🏟 {game['field']}\n"
+            f"📅 {game['date']} {game['time']}\n"
+            f"📍 {game['address']}\n"
+            f"🏆 Level: {game['level'].capitalize()}\n\n"
+            f"Your booking reference: {payment_id}\n"
+            f"We'll see you there, {user['name']}!"
+        )
+    else:
+        await callback.message.answer("Payment failed. Please try again.")
+    
+    await callback.answer()
 
 async def main():
     await dp.start_polling(bot)

@@ -1,34 +1,285 @@
 {
-  "time_slots": [
+  "games": [
     {
       "id": 1,
-      "time": "09:00-10:00",
-      "max_players": 10,
-      "players": [
-        528650144
-      ],
-      "available": true
+      "date": "2025-05-15",
+      "time": "10:00-11:00",
+      "field": "Beginner Field",
+      "photo": "beginner_field.jpg",
+      "address": "100 Beginner Avenue, Sports City",
+      "level": "beginner",
+      "max_players": 8,
+      "price": 400,
+      "players": [],
+      "description": "Beginner level game"
     },
     {
       "id": 2,
-      "time": "10:00-11:00",
+      "date": "2025-05-15",
+      "time": "12:00-13:00",
+      "field": "Intermediate Field",
+      "photo": "intermediate_field.jpg",
+      "address": "101 Intermediate Avenue, Sports City",
+      "level": "intermediate",
       "max_players": 10,
-      "players": [
-        528650144
-      ],
-      "available": true
+      "price": 500,
+      "players": [],
+      "description": "Intermediate level game"
     },
     {
       "id": 3,
-      "time": "11:00-12:00",
+      "date": "2025-05-15",
+      "time": "14:00-15:00",
+      "field": "Professional Field",
+      "photo": "professional_field.jpg",
+      "address": "102 Professional Avenue, Sports City",
+      "level": "professional",
       "max_players": 10,
+      "price": 600,
       "players": [],
-      "available": true
+      "description": "Professional level game"
+    },
+    {
+      "id": 4,
+      "date": "2025-05-16",
+      "time": "10:00-11:00",
+      "field": "Beginner Field",
+      "photo": "beginner_field.jpg",
+      "address": "100 Beginner Avenue, Sports City",
+      "level": "beginner",
+      "max_players": 8,
+      "price": 400,
+      "players": [],
+      "description": "Beginner level game"
+    },
+    {
+      "id": 5,
+      "date": "2025-05-16",
+      "time": "12:00-13:00",
+      "field": "Intermediate Field",
+      "photo": "intermediate_field.jpg",
+      "address": "101 Intermediate Avenue, Sports City",
+      "level": "intermediate",
+      "max_players": 10,
+      "price": 500,
+      "players": [],
+      "description": "Intermediate level game"
+    },
+    {
+      "id": 6,
+      "date": "2025-05-16",
+      "time": "14:00-15:00",
+      "field": "Professional Field",
+      "photo": "professional_field.jpg",
+      "address": "102 Professional Avenue, Sports City",
+      "level": "professional",
+      "max_players": 10,
+      "price": 600,
+      "players": [],
+      "description": "Professional level game"
+    },
+    {
+      "id": 7,
+      "date": "2025-05-17",
+      "time": "10:00-11:00",
+      "field": "Beginner Field",
+      "photo": "beginner_field.jpg",
+      "address": "100 Beginner Avenue, Sports City",
+      "level": "beginner",
+      "max_players": 8,
+      "price": 400,
+      "players": [],
+      "description": "Beginner level game"
+    },
+    {
+      "id": 8,
+      "date": "2025-05-17",
+      "time": "12:00-13:00",
+      "field": "Intermediate Field",
+      "photo": "intermediate_field.jpg",
+      "address": "101 Intermediate Avenue, Sports City",
+      "level": "intermediate",
+      "max_players": 10,
+      "price": 500,
+      "players": [],
+      "description": "Intermediate level game"
+    },
+    {
+      "id": 9,
+      "date": "2025-05-17",
+      "time": "14:00-15:00",
+      "field": "Professional Field",
+      "photo": "professional_field.jpg",
+      "address": "102 Professional Avenue, Sports City",
+      "level": "professional",
+      "max_players": 10,
+      "price": 600,
+      "players": [],
+      "description": "Professional level game"
+    },
+    {
+      "id": 10,
+      "date": "2025-05-18",
+      "time": "10:00-11:00",
+      "field": "Beginner Field",
+      "photo": "beginner_field.jpg",
+      "address": "100 Beginner Avenue, Sports City",
+      "level": "beginner",
+      "max_players": 8,
+      "price": 400,
+      "players": [],
+      "description": "Beginner level game"
+    },
+    {
+      "id": 11,
+      "date": "2025-05-18",
+      "time": "12:00-13:00",
+      "field": "Intermediate Field",
+      "photo": "intermediate_field.jpg",
+      "address": "101 Intermediate Avenue, Sports City",
+      "level": "intermediate",
+      "max_players": 10,
+      "price": 500,
+      "players": [],
+      "description": "Intermediate level game"
+    },
+    {
+      "id": 12,
+      "date": "2025-05-18",
+      "time": "14:00-15:00",
+      "field": "Professional Field",
+      "photo": "professional_field.jpg",
+      "address": "102 Professional Avenue, Sports City",
+      "level": "professional",
+      "max_players": 10,
+      "price": 600,
+      "players": [],
+      "description": "Professional level game"
+    },
+    {
+      "id": 13,
+      "date": "2025-05-19",
+      "time": "10:00-11:00",
+      "field": "Beginner Field",
+      "photo": "beginner_field.jpg",
+      "address": "100 Beginner Avenue, Sports City",
+      "level": "beginner",
+      "max_players": 8,
+      "price": 400,
+      "players": [],
+      "description": "Beginner level game"
+    },
+    {
+      "id": 14,
+      "date": "2025-05-19",
+      "time": "12:00-13:00",
+      "field": "Intermediate Field",
+      "photo": "intermediate_field.jpg",
+      "address": "101 Intermediate Avenue, Sports City",
+      "level": "intermediate",
+      "max_players": 10,
+      "price": 500,
+      "players": [],
+      "description": "Intermediate level game"
+    },
+    {
+      "id": 15,
+      "date": "2025-05-19",
+      "time": "14:00-15:00",
+      "field": "Professional Field",
+      "photo": "professional_field.jpg",
+      "address": "102 Professional Avenue, Sports City",
+      "level": "professional",
+      "max_players": 10,
+      "price": 600,
+      "players": [],
+      "description": "Professional level game"
+    },
+    {
+      "id": 16,
+      "date": "2025-05-20",
+      "time": "10:00-11:00",
+      "field": "Beginner Field",
+      "photo": "beginner_field.jpg",
+      "address": "100 Beginner Avenue, Sports City",
+      "level": "beginner",
+      "max_players": 8,
+      "price": 400,
+      "players": [],
+      "description": "Beginner level game"
+    },
+    {
+      "id": 17,
+      "date": "2025-05-20",
+      "time": "12:00-13:00",
+      "field": "Intermediate Field",
+      "photo": "intermediate_field.jpg",
+      "address": "101 Intermediate Avenue, Sports City",
+      "level": "intermediate",
+      "max_players": 10,
+      "price": 500,
+      "players": [],
+      "description": "Intermediate level game"
+    },
+    {
+      "id": 18,
+      "date": "2025-05-20",
+      "time": "14:00-15:00",
+      "field": "Professional Field",
+      "photo": "professional_field.jpg",
+      "address": "102 Professional Avenue, Sports City",
+      "level": "professional",
+      "max_players": 10,
+      "price": 600,
+      "players": [],
+      "description": "Professional level game"
+    },
+    {
+      "id": 19,
+      "date": "2025-05-21",
+      "time": "10:00-11:00",
+      "field": "Beginner Field",
+      "photo": "beginner_field.jpg",
+      "address": "100 Beginner Avenue, Sports City",
+      "level": "beginner",
+      "max_players": 8,
+      "price": 400,
+      "players": [],
+      "description": "Beginner level game"
+    },
+    {
+      "id": 20,
+      "date": "2025-05-21",
+      "time": "12:00-13:00",
+      "field": "Intermediate Field",
+      "photo": "intermediate_field.jpg",
+      "address": "101 Intermediate Avenue, Sports City",
+      "level": "intermediate",
+      "max_players": 10,
+      "price": 500,
+      "players": [],
+      "description": "Intermediate level game"
+    },
+    {
+      "id": 21,
+      "date": "2025-05-21",
+      "time": "14:00-15:00",
+      "field": "Professional Field",
+      "photo": "professional_field.jpg",
+      "address": "102 Professional Avenue, Sports City",
+      "level": "professional",
+      "max_players": 10,
+      "price": 600,
+      "players": [],
+      "description": "Professional level game"
     }
   ],
   "users": {
     "528650144": {
-      "name": "Aibar"
+      "name": "h",
+      "phone": "h",
+      "level": "beginner"
     }
-  }
+  },
+  "payments": {}
 }
