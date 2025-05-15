@@ -161,13 +161,13 @@ async def register_game(callback: types.CallbackQuery, state: FSMContext):
         return
     
     # Create payment
-    payment_id = Database.create_payment(game_id, callback.from_user.id)
+    # payment_id = Database.create_payment(game_id, callback.from_user.id)
     
     # Payment button
     builder = InlineKeyboardBuilder()
     builder.button(
         text=f"Pay {game['price']} RUB", 
-        callback_data=f"pay_{payment_id}"
+        callback_data=f"pay_{game_id}"
     )
     
     await callback.message.answer(
@@ -183,26 +183,29 @@ async def register_game(callback: types.CallbackQuery, state: FSMContext):
 # Payment simulation
 @dp.callback_query(F.data.startswith("pay_"))
 async def process_payment(callback: types.CallbackQuery):
-    payment_id = callback.data.split("_")[1]
+    # payment_id = callback.data.split("_")[1]
+    game_id=int(callback.data.split("_")[1])
+    payment_id=game_id
     
-    if Database.confirm_payment(payment_id):
-        payment = Database._read()["payments"][payment_id]
-        game = Database.get_game(payment["game_id"])
-        user = Database.get_user(callback.from_user.id)
-        
-        await callback.message.answer(
-            f"✅ Payment successful!\n"
-            f"You are now registered for:\n"
-            f"🏟 {game['field']}\n"
-            f"📅 {game['date']} {game['time']}\n"
-            f"📍 {game['address']}\n"
-            f"🏆 Level: {game['level'].capitalize()}\n\n"
-            f"Your booking reference: {payment_id}\n"
-            f"We'll see you there, {user['name']}!"
+    # if Database.confirm_payment(payment_id):
+    # payment = Database._read()["payments"][payment_id]
+    # game = Database.get_game(payment["game_id"])
+    game = Database.get_game(game_id)
+    user = Database.get_user(callback.from_user.id)
+    
+    await callback.message.answer(
+        f"✅ Payment successful!\n"
+        f"You are now registered for:\n"
+        f"🏟 {game['field']}\n"
+        f"📅 {game['date']} {game['time']}\n"
+        f"📍 {game['address']}\n"
+        f"🏆 Level: {game['level'].capitalize()}\n\n"
+        f"Your booking reference: {payment_id}\n"
+        f"We'll see you there, {user['name']}!"
         )
-    else:
-        await callback.message.answer("Payment failed. Please try again.")
-    
+    # else:
+    #     await callback.message.answer("Payment failed. Please try again.")
+    Database.register_player(game_id,callback.from_user.id,user)
     await callback.answer()
 
 async def main():

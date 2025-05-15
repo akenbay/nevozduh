@@ -10,7 +10,10 @@
       "level": "beginner",
       "max_players": 8,
       "price": 400,
-      "players": [],
+      "players": [
+        528650144,
+        481845077
+      ],
       "description": "Beginner level game"
     },
     {
@@ -276,9 +279,14 @@
   ],
   "users": {
     "528650144": {
-      "name": "h",
-      "phone": "h",
-      "level": "beginner"
+      "name": "aiabr",
+      "phone": "09",
+      "level": "professional"
+    },
+    "481845077": {
+      "name": "Nurmukhamed",
+      "phone": "87088780717",
+      "level": "intermediate"
     }
   },
   "payments": {}
