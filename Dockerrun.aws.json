@@ -1,0 +1,14 @@
+
+{
+ "AWSEBDockerrunVersion": "1",
+ "Image": {
+   "Name": "akenbay/dopdos-repo",
+   "Update": "true"
+ },
+"Ports": [
+ {
+   "ContainerPort": 5000,
+   "HostPort": 8000
+ }
+]
+}
